@@ -1,7 +1,15 @@
 import React from "react";
 
-const Input = ({ placeholder, value, onChange, type }) => {
-  return <input type={type} placeholder={placeholder} value={value} onChange={onChange} />;
+const Input = ({ placeholder, value, onChange, type, checked }) => {
+  return (
+    <input
+      checked={checked}
+      type={type}
+      placeholder={placeholder}
+      value={value}
+      onChange={onChange}
+    />
+  );
 };
 
-export default Input;
+export default React.memo(Input);
