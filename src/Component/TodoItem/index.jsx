@@ -4,20 +4,41 @@ import Input from "../Input";
 import { TodoDispatch } from "../../Context/todoContext";
 import { TODO_ACTION } from "../../Context/action";
 
-const TodoItem = ({ todo }) => {
+const TodoItem = ({ todo, key }) => {
   const dispatch = useContext(TodoDispatch);
   const [isEditing, setIsEditing] = useState(false);
   const handleEditing = useCallback(() => {
     setIsEditing(!isEditing);
-  });
-  const handleReWrite = useCallback((task) => {});
-  const handleRemove = useCallback((id) => {
-    dispatch({ type: TODO_ACTION.REMOVE, payload: id });
-  }, []);
+  }, [isEditing]);
+  const handleModify = useCallback(
+    (e, task) => {
+      dispatch({
+        type: TODO_ACTION.MODIFY,
+        payload: { ...task, content: e.target.value },
+      });
+    },
+    [dispatch]
+  );
+  const handleRemove = useCallback(
+    (id) => {
+      dispatch({ type: TODO_ACTION.REMOVE, payload: id });
+    },
+    [dispatch]
+  );
+  const handleCheck = (e, task) => {
+    dispatch({
+      type: TODO_ACTION.CHECK,
+      payload: { ...task, isCompleted: e.target.checked },
+    });
+  };
   return (
-    <li key={todo.id}>
+    <li>
       <div>
-        <Input type="checkbox" />
+        <Input
+          type="checkbox"
+          checked={todo.isCompleted}
+          onChange={(e) => handleCheck(e, todo)}
+        />
         {!isEditing ? (
           <>
             <span>{todo.content}</span>
@@ -28,7 +49,7 @@ const TodoItem = ({ todo }) => {
             <Input
               type="text"
               value={todo.content}
-              onChange={() => handleReWrite(todo.id)}
+              onChange={(e) => handleModify(e, todo)}
             />
             <Button children={"완료"} onClick={handleEditing} />
           </>
