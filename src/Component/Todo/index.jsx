@@ -35,11 +35,13 @@ const TodoContainer = () => {
         <div>
           <ul>
             {todoList?.map((s) => (
-              <TodoItem todo={s} />
+              <TodoItem todo={s} key={s.id} />
             ))}
           </ul>
-          <Input placeholder="입력" value={todo} onChange={onChange} />
-          <Button children={"완료"} onClick={handleSubmit} />
+          <form action="#">
+            <Input placeholder="입력" value={todo} onChange={onChange} />
+            <Button children={"완료"} onClick={handleSubmit} />
+          </form>
         </div>
       </TodoDispatch.Provider>
     </TodoTask.Provider>
