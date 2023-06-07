@@ -1,31 +1,49 @@
-import React, { useState } from "react";
+import React, { useCallback, useReducer, useState } from "react";
 import Input from "../Input";
 import Button from "../Button";
+import { TodoDispatch, TodoTask } from "../../Context/todoContext";
+import { todoReducer } from "../../Context/todoReducer";
+import { TODO_ACTION } from "../../Context/action";
+import TodoItem from "../TodoItem";
+
+const initTodoList = [];
+
+/*
+initState = [
+  {
+    id: number or uuid,
+    content : string,
+    isCompleted : boolean
+}
+]
+*/
 
 const TodoContainer = () => {
   const [todo, setTodo] = useState("");
-  const [todoList, setTodoList] = useState([]);
-
-  const onChange = (e) => {
+  const [todoList, dispatch] = useReducer(todoReducer, initTodoList);
+  const onChange = useCallback((e) => {
     setTodo(e.target.value);
-  };
-  const handleSubmit = (e) => {
-    setTodoList((s) => [...s, todo]);
+  }, []);
+  const handleSubmit = useCallback(() => {
+    dispatch({ type: TODO_ACTION.ADD, payload: todo });
     setTodo("");
-  };
+  }, [dispatch, todo]);
+
   return (
-    <div>
-      {todoList?.map((todos) => (
-        <li>
-          <div>
-            <span>{todos}</span>
-          </div>
-        </li>
-      ))}
-      <Input placeholder="입력" value={todo} onChange={onChange} />
-      <Button children={"완료"} onClick={handleSubmit} />
-    </div>
+    <TodoTask.Provider value={todoList}>
+      <TodoDispatch.Provider value={dispatch}>
+        <div>
+          <ul>
+            {todoList?.map((s) => (
+              <TodoItem todo={s} />
+            ))}
+          </ul>
+          <Input placeholder="입력" value={todo} onChange={onChange} />
+          <Button children={"완료"} onClick={handleSubmit} />
+        </div>
+      </TodoDispatch.Provider>
+    </TodoTask.Provider>
   );
 };
 
-export default TodoContainer;
+export default React.memo(TodoContainer);
