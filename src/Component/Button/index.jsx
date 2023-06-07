@@ -1,10 +1,11 @@
 import React from 'react'
+import { StyledButton } from './style'
 
 const Button = ({onClick, children}) => {
   return (
-    <button onClick={onClick}>
+    <StyledButton onClick={onClick}>
         {children}
-    </button>
+    </StyledButton>
   )
 }
 
