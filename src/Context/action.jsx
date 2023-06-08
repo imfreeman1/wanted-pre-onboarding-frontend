@@ -8,5 +8,4 @@ export const TODO_ACTION = {
 export const SIGN_ACTION = {
   EMAIL: "email",
   PASSWORD: "password",
-  SUBMIT: "submit",
 };

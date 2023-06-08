@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import Input from "../Input";
 import Button from "../Button";
 import { signReducer } from "../../Context/signReducer";
 import { SignDispatch, SignTask } from "../../Context/signContext";
 import { SIGN_ACTION } from "../../Context/action";
+import axios from "../../Utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const initState = {
   email: "",
@@ -13,31 +15,49 @@ const initState = {
 
 const Signup = () => {
   const [signTask, dispatch] = useReducer(signReducer, initState);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      navigate("/todo");
+    }
+  });
 
   const handleEmail = (e) => {
     dispatch({
       type: SIGN_ACTION.EMAIL,
-      payload: { ...signTask, email: e.target.value },
+      payload: { email: e.target.value },
     });
   };
 
   const handlePassword = (e) => {
     dispatch({
       type: SIGN_ACTION.PASSWORD,
-      payload: { ...signTask, password: e.target.value },
+      payload: { password: e.target.value },
     });
   };
 
-  const handleIsSubmit = useCallback(() => {
-    if (signTask.email.includes("@") && signTask.password.length >= 8) {
-      console.log("실행됨");
-      dispatch({
-        type: SIGN_ACTION.SUBMIT,
-        payload: { ...signTask, isSubmitting: true },
+  const handleSubmit = async () => {
+    try {
+      const request = await axios.request({
+        method: "post",
+        url: "auth/signup",
+        Headers: {
+          "Content-Type": "application/json",
+        },
+
+        data: {
+          email: signTask.email,
+          password: signTask.password,
+        },
       });
+      console.log(request);
+      if (request.status === 201) navigate("/signin");
+    } catch (error) {
+      throw new Error(error);
     }
-  }, [signTask]);
-  handleIsSubmit();
+  };
+
   return (
     <SignTask.Provider value={signTask}>
       <SignDispatch.Provider value={dispatch}>
@@ -56,7 +76,11 @@ const Signup = () => {
               onChange={(e) => handlePassword(e)}
               type="password"
             />
-            <Button children={"제출"} disabled={!signTask.isSubmitting} />
+            <Button
+              children={"제출"}
+              disabled={!signTask.isSubmitting}
+              onClick={handleSubmit}
+            />
           </form>
         </div>
       </SignDispatch.Provider>
