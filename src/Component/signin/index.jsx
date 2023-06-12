@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import Input from "../Input";
 import Button from "../Button";
 import { signReducer } from "../../Context/signReducer";
@@ -23,68 +23,76 @@ const Signin = () => {
     }
   }, []);
 
-  const handleEmail = (e) => {
+  const handleEmail = useCallback((e) => {
     dispatch({
       type: SIGN_ACTION.EMAIL,
       payload: { email: e.target.value },
     });
-  };
+  }, []);
 
-  const handlePassword = (e) => {
+  const handlePassword = useCallback((e) => {
     dispatch({
       type: SIGN_ACTION.PASSWORD,
       payload: { password: e.target.value },
     });
-  };
+  }, []);
 
-  const handleSubmit = async () => {
-    try {
-      const request = await axios.request({
-        method: "post",
-        url: "auth/signin",
-        Headers: {
-          "Content-Type": "application/json",
-        },
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      try {
+        const request = await axios.request({
+          method: "post",
+          url: "auth/signin",
+          Headers: {
+            "Content-Type": "application/json",
+          },
 
-        data: {
-          email: signTask.email,
-          password: signTask.password,
-        },
-      });
-      console.log(request);
-      if (request.status === 200) {
-        localStorage.setItem("token", request.data.access_token);
-        navigate("/todo");
+          data: {
+            email: signTask.email,
+            password: signTask.password,
+          },
+        });
+        if (request.status === 200) {
+          localStorage.setItem("token", request.data.access_token);
+          navigate("/todo");
+        }
+      } catch (error) {
+        throw new Error(error);
       }
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
+    },
+    [signTask.email, signTask.password]
+  );
   return (
     <SignTask.Provider value={signTask}>
       <SignDispatch.Provider value={dispatch}>
         <div>
-          <Input
-            placeholder="email"
-            type="text"
-            value={signTask.email}
-            onChange={(e) => handleEmail(e)}
-          />
-          <Input
-            placeholder="password"
-            type="password"
-            value={signTask.password}
-            onChange={(e) => handlePassword(e)}
-          />
-          <Button
-            children={"로그인"}
-            onClick={handleSubmit}
-            disabled={!signTask.isSubmitting}
-          />
+          <form>
+            <Input
+              placeholder="email"
+              type="text"
+              value={signTask.email}
+              onChange={(e) => handleEmail(e)}
+              testID={"email-input"}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={signTask.password}
+              onChange={(e) => handlePassword(e)}
+              testID={"password-input"}
+            />
+            <Button
+              children={"로그인"}
+              onClick={(e) => handleSubmit(e)}
+              disabled={!signTask.isSubmitting}
+              testID={"signin-button"}
+            />
+          </form>
         </div>
       </SignDispatch.Provider>
     </SignTask.Provider>
   );
 };
 
-export default Signin;
+export default React.memo(Signin);
