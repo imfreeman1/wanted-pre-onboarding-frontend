@@ -1,12 +1,16 @@
 import React from "react";
-import { StyledButton } from "./style";
 
-const Button = ({ onClick, children, disabled }) => {
+const Button = ({ onClick, children, disabled, testID, className }) => {
   return (
-    <StyledButton onClick={onClick} disabled={disabled}>
+    <button
+      className={className}
+      onClick={onClick}
+      disabled={disabled}
+      data-testid={testID}
+    >
       {children}
-    </StyledButton>
+    </button>
   );
 };
 
-export default Button;
+export default React.memo(Button);
