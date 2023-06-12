@@ -37,7 +37,8 @@ const Signup = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const request = await axios.request({
         method: "post",
@@ -69,17 +70,20 @@ const Signup = () => {
               value={signTask.email}
               onChange={(e) => handleEmail(e)}
               type="text"
+              testID={"email-input"}
             />
             <Input
               placeholder={"password"}
               value={signTask.password}
               onChange={(e) => handlePassword(e)}
               type="password"
+              testID={"password-input"}
             />
             <Button
-              children={"제출"}
+              children={"회원가입"}
               disabled={!signTask.isSubmitting}
-              onClick={handleSubmit}
+              onClick={(e) => handleSubmit(e)}
+              testID={"signup-button"}
             />
           </form>
         </div>
