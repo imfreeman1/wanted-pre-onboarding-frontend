@@ -1,13 +1,11 @@
 import { TODO_ACTION } from "./action";
-import { v4 } from "uuid";
 
 export const todoReducer = (state, action) => {
   switch (action.type) {
     case TODO_ACTION.ADD:
-      const newId = v4();
       const newTodo = {
-        id: newId,
-        content: action.payload,
+        id: action.payload.id,
+        content: action.payload.content,
         isCompleted: false,
       };
       state = [...state, newTodo];
@@ -25,6 +23,15 @@ export const todoReducer = (state, action) => {
       state = state.map((todo) => {
         if (todo.id === action.payload.id) return action.payload;
         return todo;
+      });
+      return state;
+    case TODO_ACTION.GET:
+      state = action.payload.map(({ id, todo, isCompleted }) => {
+        return {
+          id,
+          content: todo,
+          isCompleted,
+        };
       });
       return state;
     default:
